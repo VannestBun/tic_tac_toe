@@ -51,8 +51,11 @@ class Cell:
                     return
 
                 self._playboard._current_player = "O"
-                # call cpu
-                self._playboard.cpu_opps()
+                # # call cpu
+                # self._playboard.cpu_opps()
+
+                # call smart cpu
+                self._playboard.cpu_smart_opps()
 
             if self._symbol is None and self._playboard._current_player == "O":
                 self._symbol = "O"

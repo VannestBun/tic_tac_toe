@@ -129,20 +129,19 @@ class PlayBoard:
             print(possible_moves, "possible moves")
             random_move = random.choice(possible_moves)
             row, col = random_move
-            print(random_move, "random move")
+            print(random_move, "chosen move")
 
             self._cells[row][col]._symbol = "O"
             
             self._cells[row][col].draw_O()
 
-            #check win and etc for later though
             is_win = self.check_win()
             print(is_win, "is_win")
             if is_win:
                 print(f"{self._current_player} has won!")
                 return
             
-                # check draw
+            # check draw
             is_draw = self.check_draw()
             if is_draw:
                 print("its draw!")
@@ -154,13 +153,123 @@ class PlayBoard:
         # if cell symbol is O, then go on
         if self._current_player == "O":
             pass
+
+
         # check the whole board if x is occupying two spaces
         # block the winning move
+
+
+        #     so like we count the cols first, 
+        #     if x appear same row diff cal 1 less of the num_colls, means
+        #     they are about to win
+
+        # check row for blocking move
+        for row in range(self._num_rows):
+            count_x_row = 0
+            empty_cell = None
+            for col in range(self._num_cols):
+                if self._cells[row][col]._symbol == "X":
+                    count_x_row += 1
+                elif self._cells[row][col]._symbol is None:
+                    empty_cell = (row, col)
+            if count_x_row == self._num_rows - 1 and empty_cell != None:
+                self._cells[empty_cell[0]][empty_cell[1]]._symbol = "O"
+                self._cells[empty_cell[0]][empty_cell[1]].draw_O()
+                self._current_player = "X"
+                return
+        
+        # check cols for blocking move
+        for col in range(self._num_rows):
+            count_x_row = 0
+            empty_cell = None
+            for row in range(self._num_cols):
+                if self._cells[row][col]._symbol == "X":
+                    count_x_row += 1
+                elif self._cells[row][col]._symbol is None:
+                    empty_cell = (row, col)
+            if count_x_row == self._num_rows - 1 and empty_cell != None:
+                self._cells[empty_cell[0]][empty_cell[1]]._symbol = "O"
+                self._cells[empty_cell[0]][empty_cell[1]].draw_O()
+                self._current_player = "X"
+                return
+                        
+            # check which is empty then block it
+        
         # if not then pick the middle
-        # if middle is taken, then occupy the corner
+        # assume its 3x3 then middle is easy to find
+        # 4x4 or 5x5 we need something dynamic
+        #check diagonal
+        count_x = 0
+        empty_cell = None
+        for i in range(self._num_rows):
+            if self._cells[i][i]._symbol == "X":
+                count_x += 1
+            elif self._cells[i][i]._symbol is None:
+                empty_cell = (i, i)
+        
+        if count_x == self._num_rows - 1 and empty_cell:
+            self._cells[empty_cell[0]][empty_cell[1]]._symbol = "O"
+            self._cells[empty_cell[0]][empty_cell[1]].draw_O()
+            self._current_player = "X"
+            return
+        
+        #check inverse diagonal
+        count_x = 0
+        empty_cell = None
+        for i in range(self._num_rows):
+            row = i
+            col = self._num_cols - 1 - i
+            if self._cells[row][col]._symbol == "X":
+                count_x += 1
+            elif self._cells[row][col]._symbol is None:
+                empty_cell = (row, col)
+        
+        if count_x == self._num_rows - 1 and empty_cell:
+            self._cells[empty_cell[0]][empty_cell[1]]._symbol = "O"
+            self._cells[empty_cell[0]][empty_cell[1]].draw_O()
+            self._current_player = "X"
+            return
 
+        # Find Middle
+        if self._num_rows % 2 == 1 and self._num_cols % 2 == 1:
+            # Odd-sized grid: one single center
+            center = (self._num_rows // 2, self._num_cols // 2)
+            if self._cells[center[0]][center[1]]._symbol is None:
+                self._cells[center[0]][center[1]]._symbol = "O"
+                self._cells[center[0]][center[1]].draw_O()
+                self._current_player = "X"
+                return
+        else:
+            # Even-sized grid: four center cells
+            center_cells = [
+                (self._num_rows // 2 - 1, self._num_cols // 2 - 1),
+                (self._num_rows // 2 - 1, self._num_cols // 2),
+                (self._num_rows // 2, self._num_cols // 2 - 1),
+                (self._num_rows // 2, self._num_cols // 2)
+            ]
+            for center in center_cells:
+                if self._cells[center[0]][center[1]]._symbol is None:
+                    self._cells[center[0]][center[1]]._symbol = "O"
+                    self._cells[center[0]][center[1]].draw_O()
+                    self._current_player = "X"
+                    return
+                
+        # Take a corner if available
+        corners = [(0, 0), (0, self._num_cols - 1), (self._num_rows - 1, 0), (self._num_rows - 1, self._num_cols - 1)]
+        for corner in corners:
+            if self._cells[corner[0]][corner[1]]._symbol is None:
+                self._cells[corner[0]][corner[1]]._symbol = "O"
+                self._cells[corner[0]][corner[1]].draw_O()
+                self._current_player = "X"
+                return
 
-        pass
+        # Random move if no other options
+        possible_moves = [(row, col) for row in range(self._num_rows) for col in range(self._num_cols) if self._cells[row][col]._symbol is None]
+        if possible_moves:
+            random_move = random.choice(possible_moves)
+            self._cells[random_move[0]][random_move[1]]._symbol = "O"
+            self._cells[random_move[0]][random_move[1]].draw_O()
+            self._current_player = "X"
     
     def check_draw(self):
         # this will be called when the board is full and no winners

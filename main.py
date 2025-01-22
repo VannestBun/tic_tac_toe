@@ -2,8 +2,8 @@ from graphics import Window
 from playboard import PlayBoard
 
 def main():
-    num_rows = 3
-    num_cols = 3
+    num_rows = 4
+    num_cols = 4
     margin = 50
     screen_x = 800
     screen_y = 600
